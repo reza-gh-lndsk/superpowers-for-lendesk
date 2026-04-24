@@ -10,7 +10,6 @@ PLAN_PATH="${3:?Usage: $0 <repo-url> <jira-branch> <plan-path>}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/.env"
-SUPERPOWERS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOGS_DIR="$SCRIPT_DIR/logs"
 IMAGE_NAME="finmo-sandbox"
 
@@ -36,7 +35,6 @@ CONTAINER_ID=$(docker run -d \
   --env JIRA_BRANCH="$JIRA_BRANCH" \
   --env PLAN_PATH="$PLAN_PATH" \
   --volume "$LOGS_DIR:/logs" \
-  --volume "$SUPERPOWERS_DIR:/superpowers:ro" \
   "$IMAGE_NAME")
 
 echo "[host] Container started: $CONTAINER_ID"

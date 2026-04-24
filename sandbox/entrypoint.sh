@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+[[ -d /logs ]] || { echo "[sandbox] ERROR: /logs volume not mounted"; exit 1; }
+
 LOG_FILE="/logs/${JIRA_BRANCH}-$(date +%Y%m%dT%H%M%S).log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
@@ -41,9 +43,11 @@ cat > /root/.claude/settings.json <<EOF
 EOF
 
 echo "[sandbox] Starting Claude Code..."
-claude --dangerously-skip-permissions -p \
+set +e
+timeout 7200 claude --dangerously-skip-permissions -p \
   "Use superpowers:headless-driven-development to implement the plan at $PLAN_PATH"
 CLAUDE_EXIT=$?
+set -e
 
 # Check for FAILED.md as the authoritative failure signal
 if [[ -f "/workspace/repo/FAILED.md" ]]; then

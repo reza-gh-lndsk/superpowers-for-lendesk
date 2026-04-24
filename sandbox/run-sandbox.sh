@@ -55,6 +55,8 @@ echo "[host] Container exited with code: $EXIT_CODE"
 if [[ "$EXIT_CODE" == "0" ]]; then
   echo "[host] Implementation succeeded. Creating PR..."
   REPO_NAME=$(basename "$REPO_URL" .git)
+  GITHUB_TOKEN=$(grep '^GITHUB_TOKEN=' "$ENV_FILE" | cut -d= -f2-)
+  export GITHUB_TOKEN
   PR_URL=$(gh pr create \
     --repo "lendesk/$REPO_NAME" \
     --base main \

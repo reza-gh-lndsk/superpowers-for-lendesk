@@ -50,9 +50,8 @@ digraph process {
     subgraph cluster_per_task {
         label="Per Task";
         "Dispatch implementer subagent" [shape=box];
-        "Can implementer proceed without questions?" [shape=diamond];
-        "Write FAILED.md, commit, push, exit non-zero" [shape=box style=filled fillcolor=salmon];
         "Implementer implements, tests, commits, self-reviews" [shape=box];
+        "Write FAILED.md, commit, push, exit non-zero" [shape=box style=filled fillcolor=salmon];
         "Dispatch spec reviewer subagent" [shape=box];
         "Spec compliant?" [shape=diamond];
         "Implementer fixes spec gaps" [shape=box];
@@ -67,10 +66,9 @@ digraph process {
     "Push all commits, exit 0" [shape=box style=filled fillcolor=lightgreen];
 
     "Read plan, extract all tasks, create TodoWrite" -> "Dispatch implementer subagent";
-    "Dispatch implementer subagent" -> "Can implementer proceed without questions?";
-    "Can implementer proceed without questions?" -> "Write FAILED.md, commit, push, exit non-zero" [label="no"];
-    "Can implementer proceed without questions?" -> "Implementer implements, tests, commits, self-reviews" [label="yes"];
-    "Implementer implements, tests, commits, self-reviews" -> "Dispatch spec reviewer subagent";
+    "Dispatch implementer subagent" -> "Implementer implements, tests, commits, self-reviews";
+    "Implementer implements, tests, commits, self-reviews" -> "Write FAILED.md, commit, push, exit non-zero" [label="cannot proceed"];
+    "Implementer implements, tests, commits, self-reviews" -> "Dispatch spec reviewer subagent" [label="done"];
     "Dispatch spec reviewer subagent" -> "Spec compliant?";
     "Spec compliant?" -> "Implementer fixes spec gaps" [label="no"];
     "Implementer fixes spec gaps" -> "Dispatch spec reviewer subagent" [label="re-review"];

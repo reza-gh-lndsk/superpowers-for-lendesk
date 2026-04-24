@@ -15,7 +15,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `.headless-plans/implementation/YYYY-MM-DD-<feature-name>.md` (see Context Detection below)
 
 ## Bite-Sized Task Granularity
 
@@ -33,7 +33,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:headless-driven-development (container) or superpowers:subagent-driven-development (interactive) to implement this plan task-by-task.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -94,11 +94,56 @@ git commit -m "feat: add specific feature"
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD, frequent commits
 
+## Context Detection
+
+Before writing the plan, detect your context:
+
+```bash
+git rev-parse --git-dir 2>/dev/null  # outputs .git if inside a repo; empty if at workspace root
+```
+
+**Single-repo context** (`.git` exists in current directory):
+
+1. Write plan to `.headless-plans/implementation/YYYY-MM-DD-<feature-name>.md`
+2. Create and publish the JIRA branch:
+   ```bash
+   git checkout -b <JIRA-KEY>
+   mkdir -p .headless-plans/design .headless-plans/implementation
+   # copy design doc from brainstorming if it exists at workspace level
+   git add .headless-plans/
+   git commit -m "planning: add implementation plan for <JIRA-KEY>"
+   git push -u origin <JIRA-KEY>
+   ```
+
+**Workspace context** (no `.git` in current directory, subdirs are repos):
+
+Identify which repos are involved from the brainstorming conversation — do not ask.
+
+For each involved repo:
+
+1. Write a self-sufficient plan to `<repo>/.headless-plans/implementation/YYYY-MM-DD-<feature-name>.md`
+   - Each plan covers only that repo — zero cross-repo references
+   - The implementer for that repo will never see the other repos' plans
+2. Copy the design doc from the workspace `.headless-plans/design/` into the repo:
+   ```bash
+   mkdir -p <repo>/.headless-plans/design <repo>/.headless-plans/implementation
+   cp .headless-plans/design/*.md <repo>/.headless-plans/design/
+   ```
+3. Create and publish the JIRA branch in that repo:
+   ```bash
+   git -C <repo> checkout -b <JIRA-KEY>
+   git -C <repo> add .headless-plans/
+   git -C <repo> commit -m "planning: add implementation plan for <JIRA-KEY>"
+   git -C <repo> push -u origin <JIRA-KEY>
+   ```
+
+Repeat for every involved repo. Each ends up with its own JIRA branch containing both the design doc and its self-sufficient implementation plan.
+
 ## Execution Handoff
 
 After saving the plan, offer execution choice:
 
-**"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `.headless-plans/implementation/<filename>.md` in each involved repo (branch: `<JIRA-KEY>`). Two execution options:**
 
 **1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
 

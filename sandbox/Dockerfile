@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     ca-certificates \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Install gh CLI
@@ -21,18 +22,22 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 # Install Claude Code CLI
 RUN npm install -g @anthropic-ai/claude-code@2.1.119
 
-# Configure git identity (required for commits inside container)
+# Create non-root user (--dangerously-skip-permissions blocks on root)
+RUN useradd -m -s /bin/bash sandbox
+
+# Configure git identity for sandbox user
 RUN git config --global user.email "agent@sandbox.local" \
     && git config --global user.name "Sandbox Agent"
+RUN su sandbox -c 'git config --global user.email "agent@sandbox.local" && git config --global user.name "Sandbox Agent"'
 
-# Working directory for repo clone
-WORKDIR /workspace
+# Set up directories owned by sandbox user
+RUN mkdir -p /workspace /logs && chown sandbox:sandbox /workspace /logs
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Mount point for superpowers plugin (volume mounted at runtime)
-RUN mkdir -p /superpowers
+USER sandbox
+WORKDIR /workspace
 
 ENTRYPOINT ["/entrypoint.sh"]

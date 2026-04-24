@@ -24,26 +24,10 @@ cd /workspace/repo
 git checkout "$JIRA_BRANCH"
 echo "[sandbox] On branch: $(git branch --show-current)"
 
-# Configure Claude Code to use superpowers plugin from git
-mkdir -p /root/.claude
-cat > /root/.claude/settings.json <<EOF
-{
-  "enabledPlugins": {
-    "superpowers@superpowers-dev": true
-  },
-  "extraKnownMarketplaces": {
-    "superpowers-dev": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/reza-gh-lndsk/superpowers-for-lendesk.git"
-      }
-    }
-  }
-}
-EOF
-
+echo "[sandbox] Adding superpowers marketplace..."
+claude plugin marketplace add https://github.com/reza-gh-lndsk/superpowers-for-lendesk.git 2>&1
 echo "[sandbox] Installing superpowers plugin..."
-claude plugin install superpowers@superpowers-dev --yes 2>&1 || true
+claude plugin install superpowers 2>&1
 
 echo "[sandbox] Starting Claude Code..."
 set +e

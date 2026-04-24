@@ -56,7 +56,7 @@ digraph process {
         label="Per Task";
         "Dispatch implementer subagent" [shape=box];
         "Implementer implements, tests, commits, self-reviews" [shape=box];
-        "Write FAILED.md, commit, push, exit non-zero" [shape=box style=filled fillcolor=salmon];
+        "Write FAILED.md, commit, push" [shape=box style=filled fillcolor=salmon];
         "Dispatch spec reviewer subagent" [shape=box];
         "Spec compliant?" [shape=diamond];
         "Implementer fixes spec gaps" [shape=box];
@@ -72,7 +72,7 @@ digraph process {
 
     "Read plan, extract all tasks, create TodoWrite" -> "Dispatch implementer subagent";
     "Dispatch implementer subagent" -> "Implementer implements, tests, commits, self-reviews";
-    "Implementer implements, tests, commits, self-reviews" -> "Write FAILED.md, commit, push, exit non-zero" [label="cannot proceed"];
+    "Implementer implements, tests, commits, self-reviews" -> "Write FAILED.md, commit, push" [label="cannot proceed"];
     "Implementer implements, tests, commits, self-reviews" -> "Dispatch spec reviewer subagent" [label="done"];
     "Dispatch spec reviewer subagent" -> "Spec compliant?";
     "Spec compliant?" -> "Implementer fixes spec gaps" [label="no"];
@@ -110,7 +110,7 @@ Then stop. The absence of FAILED.md signals success to the container. Do not cal
 - Ask a question or pause for human input
 - Call `finishing-a-development-branch`
 - Create a PR (host script does this)
-- Skip FAILED.md before exiting non-zero (it is the debugging artifact)
+- Skip writing FAILED.md before stopping (it is the signal the container uses to detect failure and the primary debugging artifact)
 - Dispatch multiple implementation subagents in parallel (conflicts)
 - Make subagent read plan file (provide full text instead)
 - Skip spec compliance review before code quality review (wrong order)

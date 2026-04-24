@@ -119,7 +119,7 @@ digraph process {
 - Auditable — timestamped log file survives container teardown
 - FAILED.md gives precise, actionable failure diagnostics
 
-**Quality gates (same as subagent-driven-development):**
+**Quality gates (per task — no final whole-implementation review):**
 - Fresh subagent per task (no context pollution)
 - Two-stage review: spec compliance first, then code quality
 - Review loops ensure fixes actually work

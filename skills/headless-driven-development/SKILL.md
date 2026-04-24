@@ -43,8 +43,24 @@ Stop. The container detects FAILED.md on the branch.
 
 ## When to Use
 
-This skill runs inside a Docker sandbox container only. Do not use in interactive sessions.
-Use `subagent-driven-development` for interactive sessions with a human present.
+```dot
+digraph when_to_use {
+    "Running inside Docker sandbox container?" [shape=diamond];
+    "headless-driven-development" [shape=box];
+    "subagent-driven-development" [shape=box];
+    "executing-plans" [shape=box];
+
+    "Running inside Docker sandbox container?" -> "headless-driven-development" [label="yes"];
+    "Running inside Docker sandbox container?" -> "subagent-driven-development" [label="no, interactive session"];
+    "Running inside Docker sandbox container?" -> "executing-plans" [label="no, separate session"];
+}
+```
+
+**vs. subagent-driven-development:**
+- No human present — never pauses for questions or approval
+- FAILED.md replaces all human interaction paths
+- PR creation handled externally by host script
+- `--dangerously-skip-permissions` safe because container is isolated
 
 ## The Process
 
@@ -93,6 +109,20 @@ digraph process {
 - `./implementer-prompt.md` - Dispatch implementer subagent (headless variant)
 - `./spec-reviewer-prompt.md` - Dispatch spec compliance reviewer
 - `./code-quality-reviewer-prompt.md` - Dispatch code quality reviewer
+
+## Advantages
+
+**vs. subagent-driven-development:**
+- Full OS permissions inside container — no permission prompts
+- Zero host blast radius — container is destroyed after run
+- Reproducible — fresh environment every run
+- Auditable — timestamped log file survives container teardown
+- FAILED.md gives precise, actionable failure diagnostics
+
+**Quality gates (same as subagent-driven-development):**
+- Fresh subagent per task (no context pollution)
+- Two-stage review: spec compliance first, then code quality
+- Review loops ensure fixes actually work
 
 ## Completion
 

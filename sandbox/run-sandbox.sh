@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Usage: ./run-sandbox.sh <repo-url> <jira-branch> <plan-path>
-# Example: ./run-sandbox.sh https://github.com/lendesk/finmo-app FINMO-1234 docs/plans/2026-04-24-my-feature.md
+# Example: ./run-sandbox.sh https://github.com/lendesk/finmo-app FINMO-1234 .headless-plans/implementation/2026-04-24-my-feature.md
 
 REPO_URL="${1:?Usage: $0 <repo-url> <jira-branch> <plan-path>}"
 JIRA_BRANCH="${2:?Usage: $0 <repo-url> <jira-branch> <plan-path>}"

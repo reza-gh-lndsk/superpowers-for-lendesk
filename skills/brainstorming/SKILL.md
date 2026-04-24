@@ -27,7 +27,7 @@ You MUST create a task for each of these items and complete them in order:
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/plans/YYYY-MM-DD-<topic>-design.md` and commit
+5. **Write design doc** — save to `.headless-plans/design/YYYY-MM-DD-<topic>-design.md`, detect context (see After the Design), commit
 6. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
@@ -77,10 +77,21 @@ digraph brainstorming {
 
 ## After the Design
 
-**Documentation:**
-- Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+**Context detection:**
+
+```bash
+git rev-parse --git-dir 2>/dev/null  # outputs .git if inside a repo; empty if at workspace root
+```
+
+**Single-repo context** (`.git` exists in current directory):
+- Write design doc to `.headless-plans/design/YYYY-MM-DD-<topic>-design.md`
 - Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- Commit to current branch (do not create JIRA branch yet — writing-plans does that)
+
+**Workspace context** (no `.git` in current directory, subdirs are repos):
+- Write design doc to `.headless-plans/design/YYYY-MM-DD-<topic>-design.md` at workspace root
+- Identify which repos are involved — use the brainstorming conversation context, do not ask
+- The design doc will be distributed to each involved repo by writing-plans in the next step
 
 **Implementation:**
 - Invoke the writing-plans skill to create a detailed implementation plan

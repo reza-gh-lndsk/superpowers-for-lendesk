@@ -16,7 +16,7 @@ You are running inside an ephemeral Docker container. There is no human present.
 
 - **Never** ask a question or wait for input
 - **Never** call `finishing-a-development-branch` (PR is created externally)
-- If you cannot proceed on a task: write FAILED.md to repo root, commit it, push, exit non-zero
+- If you cannot proceed on a task: write FAILED.md to repo root, commit it, push. The container will detect FAILED.md and exit non-zero.
 - If all tasks complete: push all commits, exit 0
 
 The plan must be self-sufficient. If it is not, FAILED.md is the feedback mechanism.
@@ -34,7 +34,12 @@ Write this file to the repo root when stopping early:
 <specific missing information or clarification>
 ```
 
-Commit and push FAILED.md before exiting non-zero.
+After writing the file:
+```bash
+git add FAILED.md && git commit -m "ci: implementation blocked - see FAILED.md"
+git push origin HEAD
+```
+Stop. The container detects FAILED.md on the branch.
 
 ## When to Use
 
@@ -97,7 +102,7 @@ When all tasks are done:
 git push origin HEAD
 ```
 
-Then exit 0. Do not call `finishing-a-development-branch`. The host script handles PR creation.
+Then stop. The absence of FAILED.md signals success to the container. Do not call `finishing-a-development-branch`. The host script handles PR creation.
 
 ## Red Flags
 
@@ -115,12 +120,12 @@ Then exit 0. Do not call `finishing-a-development-branch`. The host script handl
 - Write FAILED.md with specific reason and what is needed
 - `git add FAILED.md && git commit -m "ci: implementation blocked - see FAILED.md"`
 - `git push origin HEAD`
-- Exit non-zero immediately
+- Stop. The container detects FAILED.md on the branch and handles the non-zero exit.
 
-**If a task fails verification:**
+**If mid-task verification fails (tests, lint):**
 - Implementer attempts one self-correction
-- If still failing: write FAILED.md, commit, push, exit non-zero
-- Do not retry indefinitely
+- If still failing after one attempt: write FAILED.md, commit, push, stop. The container detects FAILED.md.
+- Note: this cap applies to test/lint failures only, not to spec or quality review cycles (those loop until approved).
 
 ## Integration
 
